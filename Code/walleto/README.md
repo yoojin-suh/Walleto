@@ -1,6 +1,6 @@
-# Walleto - Digital Wallet Application
+# Walleto - Budget Analysis/Management System
 
-Welcome to Walleto! This is a digital wallet application built with Next.js. Follow the simple steps below to get it running on your computer.
+Welcome to Walleto! This is a digital budget management application built with Next.js. Follow the simple steps below to get it running on your computer.
 
 ## What You Need Before Starting
 
@@ -17,14 +17,14 @@ Make sure you have these installed on your computer:
 4. Open your terminal/command prompt
 5. Type this command (replace `YOUR-USERNAME` with your GitHub username):
    ```
-   git clone https://github.com/YOUR-USERNAME/walleto.git
+   git clone https://github.com/YOUR-USERNAME/Walleto/Code/walleto.git
    ```
 
 ### Option 2: Clone Directly
 1. Open your terminal/command prompt
 2. Type this command:
    ```
-   git clone https://github.com/prashantbaral/walleto.git
+   git clone https://github.com/yoojin-suh/walleto/code/walleto.git
    ```
 
 ## How to Run the Project
