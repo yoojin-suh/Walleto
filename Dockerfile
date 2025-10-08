@@ -1,17 +1,20 @@
-# Use an official lightweight Python image
-FROM python:3.9-slim
+# Use the official Node.js 18 image
+FROM node:18-alpine
 
-# Set the working directory inside the container
+# Set working directory inside container
 WORKDIR /app
 
-# Copy the code from your repository to the container
-COPY Code/ /app
+# Copy package files first to leverage Docker cache
+COPY Code/walleto/package*.json ./
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt || true
+RUN npm install
 
-# Expose the port your app runs on
-EXPOSE 8080
+# Copy the rest of your app source code
+COPY Code/walleto .
 
-# Run your application (replace app.py with your entry file if needed)
-CMD ["python", "app.py"]
+# Expose the port Next.js uses
+EXPOSE 3000
+
+# Run the app
+CMD ["npm", "run", "dev"]
