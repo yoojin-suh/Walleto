@@ -21,7 +21,6 @@ pipeline {
                 sh 'echo "All tests passed!"'
             }
         }
-
         stage('Deploy to DEV') {
             steps {
                 echo 'Deploying Walleto to DEV environment...'
@@ -29,7 +28,7 @@ pipeline {
                 docker stop walleto-dev || true
                 docker rm walleto-dev || true
                 docker build -t walleto-dev:latest .
-                docker run -d -p 8081:8080 --name walleto-dev walleto-dev:latest
+                docker run -d -p 8081:3000 --name walleto-dev walleto-dev:latest
                 '''
             }
         }
