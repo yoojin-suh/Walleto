@@ -1,34 +1,47 @@
 pipeline {
     agent any
 
+    environment {
+        APP_NAME = "walleto-dev"
+        IMAGE_NAME = "walleto-dev:latest"
+        CONTAINER_PORT = "3000"
+        HOST_PORT = "8081"
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/yoojin-suh/Walleto.git'
+                git branch: 'main', url: 'https://github.com/yoojin-suh/Walleto.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building the Walleto application...'
-                sh 'echo "Build complete!"'
+                echo "🧱 Building the Walleto application..."
+                sh 'echo Build started!'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                sh 'echo "All tests passed!"'
+                echo "🧪 Running tests..."
+                sh 'echo All tests passed!'
             }
         }
+
         stage('Deploy to DEV') {
             steps {
-                echo 'Deploying Walleto to DEV environment...'
+                echo "🚀 Deploying Walleto to DEV environment..."
                 sh '''
-                docker stop walleto-dev || true
-                docker rm walleto-dev || true
-                docker build -t walleto-dev:latest .
-                docker run -d -p 8081:3000 --name walleto-dev walleto-dev:latest
+                    # Stop and remove old container if exists
+                    docker stop ${APP_NAME} || true
+                    docker rm ${APP_NAME} || true
+
+                    # Build the Docker image
+                    docker build -t ${IMAGE_NAME} .
+
+                    # Run the new container
+                    docker run -d -p ${HOST_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${IMAGE_NAME}
                 '''
             }
         }
@@ -36,10 +49,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment to DEV successful!'
+            echo "✅ Deployment successful! Access at http://<EC2-Public-IP>:8081"
         }
         failure {
-            echo '❌ Deployment failed. Check Jenkins logs.'
+            echo "❌ Deployment failed. Check Jenkins logs."
         }
     }
 }
