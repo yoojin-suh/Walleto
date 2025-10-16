@@ -49,20 +49,20 @@ pipeline {
     }
   }
 
-  post {
-    success {
-      slackSend(
-        channel: '#team3',
-        color: 'good',
-        message: "✅ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) succeeded. App is running. 🔗 <${env.BUILD_URL}|View Build>"
-      )
-    }
-    failure {
-      slackSend(
-        channel: '#team3',
-        color: 'danger',
-        message: "❌ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) failed. 🔗 <${env.BUILD_URL}console|View logs>"
-      )
-    }
+ post {
+  success {
+    slackSend(
+      channel: '#ci-cd-implementation',
+      color: 'good',
+      message: "✅ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) succeeded! 🔗 <${env.BUILD_URL}|View Build>"
+    )
+  }
+  failure {
+    slackSend(
+      channel: '#ci-cd-implementation',
+      color: 'danger',
+      message: "❌ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) failed! 🔗 <${env.BUILD_URL}console|View Logs>"
+    )
   }
 }
+
