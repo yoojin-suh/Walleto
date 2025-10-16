@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        QA_PUBLIC_IP = '34.224.216.248'
+    }
+
+    stages {
+        stage('Checkout (for metadata only)') {
+            steps {
+                git branch: 'main', url: 'https://github.com/yoojin-suh/Walleto.git'
+            }
+        }
+
+        stage('Deploy to QA') {
+            steps {
+                sshagent(credentials: ['qa-ssh-key']) {
+                    sh '''
+                        echo "🚀 Starting deployment to QA environment..."
+                        ssh -o StrictHostKeyChecking=no ubuntu@$QA_PUBLIC_IP "mkdir -p /var/www/walleto-qa"
+                        scp -o StrictHostKeyChecking=no -r * ubuntu@$QA_PUBLIC_IP:/var/www/walleto-qa/
+                        echo "✅ QA deployment completed successfully!"
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend(
+                channel: '#ci-cd-implementation',
+                color: 'good',
+                message: "✅ *${env.JOB_NAME}* (QA) succeeded! 🔗 <${env.BUILD_URL}|View Build>"
+            )
+        }
+        failure {
+            slackSend(
+                channel: '#ci-cd-implementation',
+                color: 'danger',
+                message: "❌ *${env.JOB_NAME}* (QA) failed! 🔗 <${env.BUILD_URL}console|View Logs>"
+            )
+        }
+    }
+}
