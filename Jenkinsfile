@@ -51,10 +51,18 @@ pipeline {
 
   post {
     success {
-      echo 'Pipeline completed successfully!'
+      slackSend(
+        channel: '#team3',
+        color: 'good',
+        message: "✅ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) succeeded. App is running. 🔗 <${env.BUILD_URL}|View Build>"
+      )
     }
     failure {
-      echo 'Pipeline failed. Check Jenkins logs.'
+      slackSend(
+        channel: '#team3',
+        color: 'danger',
+        message: "❌ *${env.JOB_NAME}* #${env.BUILD_NUMBER} (DEV) failed. 🔗 <${env.BUILD_URL}console|View logs>"
+      )
     }
   }
 }
