@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -19,18 +20,22 @@ export default function Navbar() {
           </div>
 
           <div className="hidden items-center space-x-6 md:flex">
-            <a href="#features" className="text-gray-700 transition hover:text-purple-600">Features</a>
-            <a href="#how-it-works" className="text-gray-700 transition hover:text-purple-600">How It Works</a>
-            <a href="#pricing" className="text-gray-700 transition hover:text-purple-600">Pricing</a>
-            <a href="#testimonials" className="text-gray-700 transition hover:text-purple-600">Reviews</a>
-            <button className="rounded-lg border border-purple-600 px-4 py-2 text-purple-600 transition hover:bg-purple-50">
-              Sign In
-            </button>
-            <button className="rounded-lg px-4 py-2 text-white transition
-                               bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]
-                               hover:-translate-y-[2px] hover:shadow-[0_10px_25px_rgba(102,126,234,0.4)]">
-              Start Free Trial
-            </button>
+            <a href="/#features" className="text-gray-700 transition hover:text-purple-600">Features</a>
+            <a href="/#how-it-works" className="text-gray-700 transition hover:text-purple-600">How It Works</a>
+            <a href="/#pricing" className="text-gray-700 transition hover:text-purple-600">Pricing</a>
+            <a href="/#testimonials" className="text-gray-700 transition hover:text-purple-600">Reviews</a>
+            <Link href="/signin">
+              <button className="rounded-lg border border-purple-600 px-4 py-2 text-purple-600 transition hover:bg-purple-50">
+                Sign In
+              </button>
+            </Link>
+            <Link href="/signup">
+              <button className="rounded-lg px-4 py-2 text-white transition
+                                 bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]
+                                 hover:-translate-y-[2px] hover:shadow-[0_10px_25px_rgba(102,126,234,0.4)]">
+                Start Free Trial
+              </button>
+            </Link>
           </div>
 
           <button className="p-2 md:hidden" onClick={() => setOpen(v => !v)} aria-label="Toggle menu">
@@ -46,25 +51,29 @@ export default function Navbar() {
           <div className="mx-auto max-w-7xl px-4 py-4">
             <div className="flex flex-col space-y-3">
               {[
-                ["#features", "Features"],
-                ["#how-it-works", "How It Works"],
-                ["#pricing", "Pricing"],
-                ["#testimonials", "Reviews"],
+                ["/#features", "Features"],
+                ["/#how-it-works", "How It Works"],
+                ["/#pricing", "Pricing"],
+                ["/#testimonials", "Reviews"],
               ].map(([href, label]) => (
                 <a key={href} href={href} className="text-gray-900 transition hover:text-purple-600" onClick={() => setOpen(false)}>
                   {label}
                 </a>
               ))}
               <div className="flex gap-3 pt-2">
-                <button className="flex-1 rounded-lg border border-purple-600 px-4 py-2 text-purple-600 hover:bg-purple-50" onClick={() => setOpen(false)}>
-                  Sign In
-                </button>
-                <button className="flex-1 rounded-lg px-4 py-2 text-white
-                                   bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]
-                                   hover:-translate-y-[2px] hover:shadow-[0_10px_25px_rgba(102,126,234,0.4)]"
-                        onClick={() => setOpen(false)}>
-                  Start Free Trial
-                </button>
+                <Link href="/signin" className="flex-1">
+                  <button className="w-full rounded-lg border border-purple-600 px-4 py-2 text-purple-600 hover:bg-purple-50" onClick={() => setOpen(false)}>
+                    Sign In
+                  </button>
+                </Link>
+                <Link href="/signup" className="flex-1">
+                  <button className="w-full rounded-lg px-4 py-2 text-white
+                                     bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]
+                                     hover:-translate-y-[2px] hover:shadow-[0_10px_25px_rgba(102,126,234,0.4)]"
+                          onClick={() => setOpen(false)}>
+                    Start Free Trial
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
