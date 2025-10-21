@@ -304,4 +304,4 @@ See `backend/ALEMBIC_GUIDE.md` for detailed migration instructions.
 
 ## Team
 
-Developed by the Walleto team for CST499 Capstone Project.
+Developed by the Walleto team for CS691 Capstone Project Team.
