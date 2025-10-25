@@ -35,14 +35,23 @@ pipeline {
     stage('Deploy') {
       steps {
         dir('Code/walleto') {
-          echo '🚀 Starting the app using PM2 (if installed)...'
+          echo '🚀 Deploying app using PM2 (Next.js on port 3000)...'
           sh '''
-          if ! command -v pm2 &> /dev/null; then
-            npm install -g pm2
-          fi
-          pm2 stop all || true
-          pm2 start npm --name "walleto" -- start
-          pm2 save
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+
+            # Stop and clear old processes
+            pm2 stop all || true
+            pm2 delete all || true
+
+            # Start new process with proper host binding (important!)
+            pm2 start npm --name "walleto" -- start -- -H 0.0.0.0 -p 3000
+
+            # Save PM2 configuration for persistence
+            pm2 save
+
+            echo "✅ App successfully deployed and accessible at http://$(curl -s http://checkip.amazonaws.com):3000"
           '''
         }
       }
