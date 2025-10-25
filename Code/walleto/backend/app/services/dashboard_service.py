@@ -11,14 +11,10 @@ from typing import List
 
 
 def get_dashboard_stats(db: Session, user_id: str) -> DashboardStats:
-    """Calculate dashboard statistics."""
+    """Calculate dashboard statistics for current month."""
     now = datetime.now()
     current_month = now.month
     current_year = now.year
-
-    # Get previous month for comparison
-    prev_month = current_month - 1 if current_month > 1 else 12
-    prev_year = current_year if current_month > 1 else current_year - 1
 
     # Total balance across all accounts
     total_balance = get_total_balance(db, user_id)
@@ -43,35 +39,6 @@ def get_dashboard_stats(db: Session, user_id: str) -> DashboardStats:
         )
     ).scalar() or 0.0
 
-    # Previous month income
-    prev_monthly_income = db.query(func.sum(Transaction.amount)).filter(
-        and_(
-            Transaction.user_id == user_id,
-            Transaction.type == "income",
-            extract('month', Transaction.transaction_date) == prev_month,
-            extract('year', Transaction.transaction_date) == prev_year
-        )
-    ).scalar() or 0.0
-
-    # Previous month expenses
-    prev_monthly_expenses = db.query(func.sum(Transaction.amount)).filter(
-        and_(
-            Transaction.user_id == user_id,
-            Transaction.type == "expense",
-            extract('month', Transaction.transaction_date) == prev_month,
-            extract('year', Transaction.transaction_date) == prev_year
-        )
-    ).scalar() or 0.0
-
-    # Calculate percentage changes
-    income_change = 0.0
-    if prev_monthly_income > 0:
-        income_change = ((monthly_income - prev_monthly_income) / prev_monthly_income) * 100
-
-    expense_change = 0.0
-    if prev_monthly_expenses > 0:
-        expense_change = ((monthly_expenses - prev_monthly_expenses) / prev_monthly_expenses) * 100
-
     # Calculate savings rate
     savings_rate = 0.0
     if monthly_income > 0:
@@ -81,9 +48,7 @@ def get_dashboard_stats(db: Session, user_id: str) -> DashboardStats:
         total_balance=float(total_balance),
         monthly_income=float(monthly_income),
         monthly_expenses=float(monthly_expenses),
-        savings_rate=float(savings_rate),
-        income_change=float(income_change),
-        expense_change=float(expense_change)
+        savings_rate=float(savings_rate)
     )
 
 
@@ -91,9 +56,7 @@ def get_recent_transactions(db: Session, user_id: str, limit: int = 10) -> List[
     """Get recent transactions for dashboard."""
     results = db.query(
         Transaction,
-        Category.name.label("category_name"),
-        Category.color.label("category_color"),
-        Category.icon.label("category_icon")
+        Category.name.label("category_name")
     ).outerjoin(
         Category, Transaction.category_id == Category.id
     ).filter(
@@ -103,15 +66,15 @@ def get_recent_transactions(db: Session, user_id: str, limit: int = 10) -> List[
     ).limit(limit).all()
 
     transactions = []
-    for trans, cat_name, cat_color, cat_icon in results:
+    for trans, cat_name in results:
         transactions.append(RecentTransactionSummary(
             id=trans.id,
             description=trans.description,
             amount=trans.amount if trans.type == "income" else -trans.amount,
             type=trans.type,
             category_name=cat_name or "Uncategorized",
-            category_color=cat_color or "gray",
-            category_icon=cat_icon or "FiDollarSign",
+            category_color="gray",
+            category_icon="FiDollarSign",
             transaction_date=trans.transaction_date.strftime("%Y-%m-%d")
         ))
 
@@ -129,7 +92,6 @@ def get_dashboard_data(db: Session, user_id: str) -> DashboardResponse:
         {
             "id": b.id,
             "category_name": b.category_name,
-            "category_color": b.category_color,
             "amount": b.amount,
             "spent": b.spent,
             "remaining": b.remaining,

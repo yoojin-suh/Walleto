@@ -250,14 +250,14 @@ class ApiClient {
     return this.request<any[]>('/api/financial/categories');
   }
 
-  async createCategory(data: { name: string; icon?: string; color?: string }) {
+  async createCategory(data: { name: string; type: string }) {
     return this.request<any>('/api/financial/categories', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateCategory(id: string, data: { name?: string; icon?: string; color?: string }) {
+  async updateCategory(id: string, data: { name?: string; type?: string }) {
     return this.request<any>(`/api/financial/categories/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),

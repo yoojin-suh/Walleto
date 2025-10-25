@@ -22,8 +22,7 @@ def create_category(db: Session, user_id: str, data: CategoryCreate) -> Category
     category = Category(
         user_id=user_id,
         name=data.name,
-        icon=data.icon,
-        color=data.color
+        type=data.type
     )
 
     db.add(category)
@@ -32,9 +31,14 @@ def create_category(db: Session, user_id: str, data: CategoryCreate) -> Category
     return category
 
 
-def get_categories(db: Session, user_id: str) -> List[Category]:
-    """Get all categories for the user."""
-    return db.query(Category).filter(Category.user_id == user_id).all()
+def get_categories(db: Session, user_id: str, type_filter: Optional[str] = None) -> List[Category]:
+    """Get all categories for the user, optionally filtered by type (income/expense)."""
+    query = db.query(Category).filter(Category.user_id == user_id)
+
+    if type_filter and type_filter in ['income', 'expense']:
+        query = query.filter(Category.type == type_filter)
+
+    return query.all()
 
 
 def get_category(db: Session, user_id: str, category_id: str) -> Optional[Category]:
@@ -74,10 +78,8 @@ def update_category(db: Session, user_id: str, category_id: str, data: CategoryU
     # Update fields
     if data.name is not None:
         category.name = data.name
-    if data.icon is not None:
-        category.icon = data.icon
-    if data.color is not None:
-        category.color = data.color
+    if data.type is not None:
+        category.type = data.type
 
     db.commit()
     db.refresh(category)

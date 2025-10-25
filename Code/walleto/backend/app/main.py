@@ -4,16 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 from app.core.config import settings
-from app.core.database import SessionLocal
+from app.core.database import SessionLocal, engine, Base
 from app.api.routes import auth, otp, financial
 from app.services.otp_service import cleanup_expired_otps
 from app.services.device_service import cleanup_expired_devices
 
-logger = logging.getLogger(__name__)
+# Import all models to ensure they're registered with Base
+from app import models
 
-# Database tables are now managed by Alembic migrations
-# Run "alembic upgrade head" to create/update tables
-# See ALEMBIC_GUIDE.md for more information
+logger = logging.getLogger(__name__)
 
 # Background scheduler for OTP cleanup
 scheduler = AsyncIOScheduler()
@@ -26,6 +25,10 @@ async def lifespan(app: FastAPI):
     This runs when the app starts and stops.
     """
     # STARTUP: This code runs when the app starts
+    # Create database tables
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created/verified")
+
     scheduler.add_job(
         run_cleanup,
         'interval',

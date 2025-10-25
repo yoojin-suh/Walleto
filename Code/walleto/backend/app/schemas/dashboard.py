@@ -8,8 +8,6 @@ class DashboardStats(BaseModel):
     monthly_income: float
     monthly_expenses: float
     savings_rate: float
-    income_change: float
-    expense_change: float
 
 
 class RecentTransactionSummary(BaseModel):

@@ -43,6 +43,13 @@ def create_transaction(db: Session, user_id: str, data: TransactionCreate) -> Tr
                 detail="Category not found"
             )
 
+        # Validate category type matches transaction type
+        if category.type != data.type:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot use {category.type} category for {data.type} transaction. Please select a {data.type} category."
+            )
+
     transaction = Transaction(
         user_id=user_id,
         account_id=data.account_id,
@@ -73,8 +80,6 @@ def get_transactions(
     query = db.query(
         Transaction,
         Category.name.label("category_name"),
-        Category.color.label("category_color"),
-        Category.icon.label("category_icon"),
         Account.name.label("account_name")
     ).outerjoin(
         Category, Transaction.category_id == Category.id
@@ -95,7 +100,7 @@ def get_transactions(
 
     # Convert to TransactionWithDetails
     transactions = []
-    for trans, cat_name, cat_color, cat_icon, acc_name in results:
+    for trans, cat_name, acc_name in results:
         trans_dict = {
             "id": trans.id,
             "user_id": trans.user_id,
@@ -109,8 +114,7 @@ def get_transactions(
             "created_at": trans.created_at,
             "updated_at": trans.updated_at,
             "category_name": cat_name,
-            "category_color": cat_color,
-            "category_icon": cat_icon,
+            "category_color": "gray",
             "account_name": acc_name
         }
         transactions.append(TransactionWithDetails(**trans_dict))
@@ -137,6 +141,27 @@ def get_transaction(db: Session, user_id: str, transaction_id: str) -> Transacti
 def update_transaction(db: Session, user_id: str, transaction_id: str, data: TransactionUpdate) -> Transaction:
     """Update a transaction."""
     transaction = get_transaction(db, user_id, transaction_id)
+
+    # Validate category type matches transaction type if category is being updated
+    if data.category_id is not None:
+        category = db.query(Category).filter(
+            Category.id == data.category_id,
+            Category.user_id == user_id
+        ).first()
+
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found"
+            )
+
+        # Check if type matches (use new type if being updated, otherwise current type)
+        transaction_type = data.type if data.type is not None else transaction.type
+        if category.type != transaction_type:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot use {category.type} category for {transaction_type} transaction. Please select a {transaction_type} category."
+            )
 
     # If amount or type changes, need to adjust account balance
     if (data.amount and data.amount != transaction.amount) or (data.type and data.type != transaction.type):

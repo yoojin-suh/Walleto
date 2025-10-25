@@ -48,11 +48,12 @@ def create_category(
 
 @router.get("/categories", response_model=List[CategoryResponse])
 def get_categories(
+    type: Optional[str] = Query(None, regex="^(income|expense)$"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all categories for the current user."""
-    return category_service.get_categories(db, current_user.id)
+    """Get all categories for the current user. Optional type filter: income or expense."""
+    return category_service.get_categories(db, current_user.id, type_filter=type)
 
 
 @router.get("/categories/{category_id}", response_model=CategoryResponse)

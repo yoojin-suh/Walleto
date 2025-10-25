@@ -41,4 +41,3 @@ class BudgetWithSpending(BudgetResponse):
     percentage: float = 0.0
     is_over_budget: bool = False
     category_name: str
-    category_color: str

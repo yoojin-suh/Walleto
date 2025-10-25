@@ -101,8 +101,7 @@ def get_budgets(db: Session, user_id: str, month: int = None, year: int = None) 
             remaining=remaining,
             percentage=percentage,
             is_over_budget=is_over_budget,
-            category_name=category.name,
-            category_color=category.color
+            category_name=category.name
         )
 
         result.append(budget_with_spending)
